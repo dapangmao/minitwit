@@ -62,7 +62,14 @@ def timeline():
                                     where who_id = ?))
         order by message.pub_date desc limit ?''',
         [session['user_id'], session['user_id'], PER_PAGE]))
-             
+   id = session['use_id']
+   ids = User.Key(id).following.append(id)
+   mydict = User.Key.IN(ids).fetch(30)
+   mylst = []
+   for x in mydict:
+        for y in x['messages']:
+             item = [x['user'], x['pub_date'], ]
+   
              
 @app.route('/public')
 def public_timeline():

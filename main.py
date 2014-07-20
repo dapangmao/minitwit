@@ -20,15 +20,11 @@ class User(ndb.Model):
     pw_hash = ndb.StringProperty(required=True)
     following = ndb.ListProperty(ndb.Key)
     start_date = ndb.DateTimeProperty(auto_now_add=True)
+    messages = ndb.StructuredProperty(Message, repeated=True)
     
 class Message(ndb.Model):
-    # author = ndb.ReferenceProperty(User)
     text = ndb.TextProperty(required=True)
     pub_date = ndb.DateTimeProperty(auto_now_add=True)
-
-
-
-
 
 
 def format_datetime(timestamp):
@@ -46,9 +42,9 @@ def gravatar_url(email, size=80):
 def before_request():
     g.user = None
     if 'user_id' in session:
-        g.user = query_db('select * from user where user_id = ?',
-                          [session['user_id']], one=True)
-
+     #    g.user = query_db('select * from user where user_id = ?',
+     #                      [session['user_id']], one=True)
+        g.user = User.Key(session['user_id']).fetch(1)
 
 @app.route('/')
 def timeline():
@@ -66,8 +62,8 @@ def timeline():
                                     where who_id = ?))
         order by message.pub_date desc limit ?''',
         [session['user_id'], session['user_id'], PER_PAGE]))
-
-
+             
+             
 @app.route('/public')
 def public_timeline():
     """Displays the latest messages of all users."""

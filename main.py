@@ -50,19 +50,19 @@ def before_request():
 
 @app.route('/')
 def timeline():
-	"""Shows a users timeline or if no user is logged in it will
-	redirect to the public timeline.  This timeline shows the user's
-	messages as well as all the messages of followed users.
-	"""
-	if not g.user:
-	    return redirect(url_for('public_timeline'))
-	cid = session['user_id']
-	ids = User.get_by_id(cid).following.append(cid)
-	messages = Message.query(Message.author.IN(ids)).order(-Message.pub_date).fetch(30)
+    """Shows a users timeline or if no user is logged in it will
+    redirect to the public timeline. This timeline shows the user's
+    messages as well as all the messages of followed users.
+    """
+    if not g.user:
+        return redirect(url_for('public_timeline'))
+    cid = session['user_id']
+    ids = User.get_by_id(cid).following.append(cid)
+    messages = Message.query(Message.author.IN(ids)).order(-Message.pub_date).fetch(30)
     if not messages:
         messages = []
     return render_template('timeline.html', messages = messages)
-
+    
 @app.route('/public')
 def public_timeline():
     """Displays the latest messages of all users."""

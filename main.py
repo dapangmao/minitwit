@@ -23,6 +23,7 @@ class User(ndb.Model):
     messages = ndb.StructuredProperty(Message, repeated=True)
     
 class Message(ndb.Model):
+	author = ndb.StringProperty(required=True)
     text = ndb.TextProperty(required=True)
     pub_date = ndb.DateTimeProperty(auto_now_add=True)
 
@@ -48,29 +49,37 @@ def before_request():
 
 @app.route('/')
 def timeline():
-    """Shows a users timeline or if no user is logged in it will
-    redirect to the public timeline.  This timeline shows the user's
-    messages as well as all the messages of followed users.
-    """
-    if not g.user:
-        return redirect(url_for('public_timeline'))
-    return render_template('timeline.html', messages=query_db('''
-        select message.*, user.* from message, user
-        where message.author_id = user.user_id and (
-            user.user_id = ? or
-            user.user_id in (select whom_id from follower
-                                    where who_id = ?))
-        order by message.pub_date desc limit ?''',
-        [session['user_id'], session['user_id'], PER_PAGE]))
-   id = session['use_id']
-   ids = User.Key(id).following.append(id)
-   mydict = User.Key.IN(ids).fetch(30)
-   mylst = []
-   for x in mydict:
-        for y in x['messages']:
-             item = [x['user'], x['pub_date'], ]
-   
-             
+	"""Shows a users timeline or if no user is logged in it will
+	redirect to the public timeline.  This timeline shows the user's
+	messages as well as all the messages of followed users.
+	"""
+	if not g.user:
+	    return redirect(url_for('public_timeline'))
+	
+	id = session['use_id']
+	following_ids = User.get_by_id(id)['following']
+	ids = following_ids.append(id)
+	_l = []
+	for current_id in ids:
+		current_entity = User.get_by_id(current_id)
+		for current_message in current_entity['messages']:
+			_d = {}
+			_d['username'] = current_entity['username']
+			_d['text'] = current_message['text']
+			_d['pub_date'] = current_message['pub_date']
+			_l.append(_d)
+	_l = sorted(_l, key = lambda x:x['pub_date'], reversed = True) 
+	_l = _l[0:30] 
+	#  return render_template('timeline.html', messages=query_db('''
+	#  select message.*, user.* from message, user
+	#  where message.author_id = user.user_id and (
+	#   user.user_id = ? or
+	#   user.user_id in (select whom_id from follower
+	#                           where who_id = ?))
+	#  order by message.pub_date desc limit ?''',
+	# [session['user_id'], session['user_id'], PER_PAGE]))
+	return render_template('timeline.html', messages = _l)
+        
 @app.route('/public')
 def public_timeline():
     """Displays the latest messages of all users."""

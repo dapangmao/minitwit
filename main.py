@@ -44,7 +44,7 @@ def before_request():
     if 'user_id' in session:
      #    g.user = query_db('select * from user where user_id = ?',
      #                      [session['user_id']], one=True)
-        g.user = User.Key(session['user_id']).fetch(1)
+        g.user = User.get_by_id(session['user_id'])
 
 @app.route('/')
 def timeline():

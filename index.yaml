@@ -1,0 +1,7 @@
+indexes:
+
+- kind: Message
+  ancestor: no
+  properties:
+  - name: pub_date
+    direction: desc

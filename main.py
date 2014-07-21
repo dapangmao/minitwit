@@ -57,9 +57,12 @@ def timeline():
     if not g.user:
         return redirect(url_for('public_timeline'))
     cid = session['user_id']
-    ids = User.get_by_id(cid).following.append(cid)
-    messages = Message.query(Message.author.IN(ids)).order(-Message.pub_date).fetch(30)
-    if not messages:
+    f = User.get_by_id(cid).following
+    ids = [f] if not isinstance(f, list) else f
+    ids.append(cid)
+    try:
+        messages = Message.query(Message.author.IN(ids)).order(-Message.pub_date).fetch(30)
+    except:
         messages = []
     return render_template('timeline.html', messages = messages)
     
@@ -79,7 +82,7 @@ def user_timeline(username):
         abort(404)
     followed = False
     if g.user and pid in User.get_by_id(cid).following:
-        	followed = True
+        followed = True
     return render_template('timeline.html', messages = Message.query(Message.author == pid).order(-Message.pub_date).fetch(30), \
     		followed = followed, \
             profile_user = profile_user)
@@ -126,7 +129,7 @@ def add_message():
         abort(401)
     if request.form['text']:
     	new_message = Message(author = session['user_id'], text = request.form['text'])
-	new_message.put()
+        new_message.put()
         flash('Your message was recorded')
     return redirect(url_for('timeline'))
 

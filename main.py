@@ -19,7 +19,7 @@ class User(ndb.Model):
     start_date = ndb.DateTimeProperty(auto_now_add=True)
     
 class Message(ndb.Model):
-    author = ndb.StringProperty()
+    author = ndb.IntegerProperty()
     text = ndb.TextProperty(required=True)
     pub_date = ndb.DateTimeProperty(auto_now_add=True)
     
@@ -60,10 +60,7 @@ def timeline():
     f = User.get_by_id(cid).following
     ids = f if isinstance(f, list) else [f]
     ids.append(cid)
-    try:
-        messages = Message.query(Message.author.IN(ids)).order(-Message.pub_date).fetch(30)
-    except:
-        messages = []
+    messages = Message.query(Message.author.IN(ids)).order(-Message.pub_date).fetch(30)
     return render_template('timeline.html', messages = messages)
     
 @app.route('/public')

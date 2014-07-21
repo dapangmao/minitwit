@@ -74,7 +74,7 @@ def public_timeline():
 def user_timeline(username):
     """Display's a users tweets."""
     cid = session['user_id']
-    profile_user = User.query(username == username).get()
+    profile_user = User.query(User.username == username).get()
     pid = profile_user.key.id()
     if profile_user is None:
         abort(404)

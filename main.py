@@ -25,6 +25,10 @@ class Message(ndb.Model):
     author = ndb.KeyProperty()
     text = ndb.TextProperty(required=True)
     pub_date = ndb.DateTimeProperty(auto_now_add=True)
+    
+def get_user_id(u):
+    a = User.query(User.username == u).get()
+    return a.key.id()
 
 
 def format_datetime(timestamp):
@@ -61,7 +65,7 @@ def timeline():
 def public_timeline():
     """Displays the latest messages of all users."""
     messages = Message.query().order(-Message.pub_date).fetch(30)
-    return render_template('timeline.html', messages=messages)
+    return render_template('timeline.html', messages = messages)
 
 @app.route('/<username>')
 def user_timeline(username):
@@ -74,7 +78,7 @@ def user_timeline(username):
     followed = False
     if g.user and pid in User.get_by_id(cid).following:
         	followed = True
-    return render_template('timeline.html', messages = Message.query(author == pid).order(-Message.pub_date).fetch(30), \
+    return render_template('timeline.html', messages = Message.query(Message.author == pid).order(-Message.pub_date).fetch(30), \
     		followed = followed, \
             profile_user = profile_user)
 			
@@ -85,8 +89,8 @@ def follow_user(username):
     cid = session['user_id']
     if not g.user:
         abort(401)
-    whom = User.query(User.username == username).get()
-    whom_id = whom.key.id()
+    
+    whom_id = get_user_id(username)
     if whom_id is None:
         abort(404)
     a = User.get_by_id(cid).following.append(whom_id)
@@ -101,8 +105,9 @@ def unfollow_user(username):
     cid = session['user_id']
     if not g.user:
         abort(401)
-    whom = User.query(User.username == username).get()
-    whom_id = whom.key.id()
+
+    whom_id = get_user_id(username)
+    
     if whom_id is None:
         abort(404)
 
@@ -119,7 +124,7 @@ def add_message():
         abort(401)
     if request.form['text']:
     	new_message = Message(author = session['user_id'], text = request.form['text'])
-		new_message.put()
+	new_message.put()
         flash('Your message was recorded')
     return redirect(url_for('timeline'))
 
@@ -131,23 +136,18 @@ def login():
         return redirect(url_for('timeline'))
     error = None
     if request.method == 'POST':
-        user = User.query(username == request.form['username']).get()
+
         if user is None:
             error = 'Invalid username'
-        elif not check_password_hash(user['pw_hash'],
+        elif not check_password_hash(user.pw_hash,
                                      request.form['password']):
             error = 'Invalid password'
         else:
             flash('You were logged in')
-            session['user_id'] = user.key.id()
+            session['user_id'] = get_user_id(request.form['username'])
             return redirect(url_for('timeline'))
     return render_template('login.html', error=error)
 
-def get_user_id(u):
-	a = User.query(User.username == u).fetch()
-	if len(a) > 0:
-		return True
-	return False
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -159,18 +159,18 @@ def register():
         if not request.form['username']:
             error = 'You have to enter a username'
         elif not request.form['email'] or \
-                 '@' not in request.form['email']:
+		'@' not in request.form['email']:
             error = 'You have to enter a valid email address'
         elif not request.form['password']:
             error = 'You have to enter a password'
         elif request.form['password'] != request.form['password2']:
             error = 'The two passwords do not match'
-        elif get_user_id:
+        elif get_user_id(request.form['username']) is not None:
             error = 'The username is already taken'
         else:
-            new_user = User(username = request.form['username'], email = request.form['email'], \
+            a = User(username = request.form['username'], email = request.form['email'], \
             	pw_hash = generate_password_hash(request.form['password']))
-            new_user.put()
+            a.put()
             flash('You were successfully registered and can login now')
             return redirect(url_for('login'))
     return render_template('register.html', error=error)

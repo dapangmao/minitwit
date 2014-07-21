@@ -3,5 +3,6 @@ indexes:
 - kind: Message
   ancestor: no
   properties:
+  - name: author
   - name: pub_date
     direction: desc

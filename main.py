@@ -1,12 +1,9 @@
-from google.appengine.ext import ndb
-from flask import Flask, request, session, redirect, url_for, abort, \
 
-import time
 from hashlib import md5
 from datetime import datetime
-from flask import Flask, request, session, url_for, redirect, \
-     render_template, abort, g, flash, _app_ctx_stack
+from flask import Flask, request, session, url_for, redirect, render_template, abort, g, flash
 from werkzeug import check_password_hash, generate_password_hash
+from google.appengine.ext import ndb
 
 # create our little application :)
 app = Flask(__name__)
@@ -18,7 +15,7 @@ class User(ndb.Model):
     username = ndb.StringProperty(required=True)
     email = ndb.StringProperty(required=True)
     pw_hash = ndb.StringProperty(required=True)
-    following = ndb.ListProperty(ndb.Key)
+    following = ndb.KeyProperty(repeated=True)
     start_date = ndb.DateTimeProperty(auto_now_add=True)
     
 class Message(ndb.Model):
@@ -70,7 +67,7 @@ def public_timeline():
 @app.route('/<username>')
 def user_timeline(username):
     """Display's a users tweets."""
-	cid = session['user_id']
+    cid = session['user_id']
     profile_user = User.query(username == username).get()
     pid = profile_user.key.id()
     if profile_user is None:
@@ -136,7 +133,7 @@ def login():
         return redirect(url_for('timeline'))
     error = None
     if request.method == 'POST':
-
+        user = User.query(User.username == request.form['username']).fetch(1)
         if user is None:
             error = 'Invalid username'
         elif not check_password_hash(user.pw_hash,

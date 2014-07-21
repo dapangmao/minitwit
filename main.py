@@ -58,7 +58,7 @@ def timeline():
         return redirect(url_for('public_timeline'))
     cid = session['user_id']
     f = User.get_by_id(cid).following
-    ids = [f] if not isinstance(f, list) else f
+    ids = f if isinstance(f, list) else [f]
     ids.append(cid)
     try:
         messages = Message.query(Message.author.IN(ids)).order(-Message.pub_date).fetch(30)

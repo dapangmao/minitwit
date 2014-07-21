@@ -75,9 +75,9 @@ def user_timeline(username):
     """Display's a users tweets."""
     cid = session['user_id']
     profile_user = User.query(User.username == username).get()
-    pid = profile_user.key.id()
     if profile_user is None:
         abort(404)
+    pid = profile_user.key.id()
     followed = False
     if g.user and pid in User.get_by_id(cid).following:
         followed = True

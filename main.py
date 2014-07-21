@@ -20,7 +20,6 @@ class User(ndb.Model):
     pw_hash = ndb.StringProperty(required=True)
     following = ndb.ListProperty(ndb.Key)
     start_date = ndb.DateTimeProperty(auto_now_add=True)
-    messages = ndb.StructuredProperty(Message, repeated=True)
     
 class Message(ndb.Model):
     author = ndb.KeyProperty()

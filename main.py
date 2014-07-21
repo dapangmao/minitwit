@@ -23,7 +23,7 @@ class User(ndb.Model):
     messages = ndb.StructuredProperty(Message, repeated=True)
     
 class Message(ndb.Model):
-	author = ndb.StringProperty(required=True)
+    author = ndb.KeyProperty()
     text = ndb.TextProperty(required=True)
     pub_date = ndb.DateTimeProperty(auto_now_add=True)
 
@@ -148,11 +148,8 @@ def add_message():
     if 'user_id' not in session:
         abort(401)
     if request.form['text']:
-        db = get_db()
-        db.execute('''insert into message (author_id, text, pub_date)
-          values (?, ?, ?)''', (session['user_id'], request.form['text'],
-                                int(time.time())))
-        db.commit()
+    	new_message = Message(author = session['user_id'], text = request.form['text'])
+		new_message.put()
         flash('Your message was recorded')
     return redirect(url_for('timeline'))
 
@@ -164,8 +161,7 @@ def login():
         return redirect(url_for('timeline'))
     error = None
     if request.method == 'POST':
-        user = query_db('''select * from user where
-            username = ?''', [request.form['username']], one=True)
+        user = User.query(username == request.form['username']).get()
         if user is None:
             error = 'Invalid username'
         elif not check_password_hash(user['pw_hash'],
@@ -173,10 +169,15 @@ def login():
             error = 'Invalid password'
         else:
             flash('You were logged in')
-            session['user_id'] = user['user_id']
+            session['user_id'] = user.key.id()
             return redirect(url_for('timeline'))
     return render_template('login.html', error=error)
 
+def get_user_id(u):
+	a = User.query(username==u).fetch()
+	if len(a) > 0:
+		return True
+	return False
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -194,15 +195,12 @@ def register():
             error = 'You have to enter a password'
         elif request.form['password'] != request.form['password2']:
             error = 'The two passwords do not match'
-        elif get_user_id(request.form['username']) is not None:
+        elif get_user_id:
             error = 'The username is already taken'
         else:
-            db = get_db()
-            db.execute('''insert into user (
-              username, email, pw_hash) values (?, ?, ?)''',
-              [request.form['username'], request.form['email'],
-               generate_password_hash(request.form['password'])])
-            db.commit()
+            new_user = User(username = request.form['username'], email = request.form['email'], \
+            	pw_hash = generate_password_hash(request.form['password']))
+            new_user.put()
             flash('You were successfully registered and can login now')
             return redirect(url_for('login'))
     return render_template('register.html', error=error)

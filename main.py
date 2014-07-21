@@ -43,8 +43,6 @@ def gravatar_url(email, size=80):
 def before_request():
     g.user = None
     if 'user_id' in session:
-     #    g.user = query_db('select * from user where user_id = ?',
-     #                      [session['user_id']], one=True)
         g.user = User.get_by_id(session['user_id'])
 
 @app.route('/')
@@ -55,73 +53,45 @@ def timeline():
 	"""
 	if not g.user:
 	    return redirect(url_for('public_timeline'))
-	
-	id = session['use_id']
-	following_ids = User.get_by_id(id)['following']
-	ids = following_ids.append(id)
-	_l = []
-	for current_id in ids:
-		current_entity = User.get_by_id(current_id)
-		for current_message in current_entity['messages']:
-			_d = {}
-			_d['username'] = current_entity['username']
-			_d['text'] = current_message['text']
-			_d['pub_date'] = current_message['pub_date']
-			_l.append(_d)
-	_l = sorted(_l, key = lambda x:x['pub_date'], reversed = True) 
-	_l = _l[0:30] 
-	#  return render_template('timeline.html', messages=query_db('''
-	#  select message.*, user.* from message, user
-	#  where message.author_id = user.user_id and (
-	#   user.user_id = ? or
-	#   user.user_id in (select whom_id from follower
-	#                           where who_id = ?))
-	#  order by message.pub_date desc limit ?''',
-	# [session['user_id'], session['user_id'], PER_PAGE]))
-	return render_template('timeline.html', messages = _l)
+	cid = session['user_id']
+	ids = User.get_by_id(cid).following.append(cid)
+	messages = Message.query(Message.author.IN(ids)).order(-Message.pub_date).fetch(30)
+	return render_template('timeline.html', messages = messages)
         
 @app.route('/public')
 def public_timeline():
     """Displays the latest messages of all users."""
-    return render_template('timeline.html', messages=query_db('''
-        select message.*, user.* from message, user
-        where message.author_id = user.user_id
-        order by message.pub_date desc limit ?''', [PER_PAGE]))
-
+    messages = Message.query().order(-Message.pub_date).fetch(30)
+    return render_template('timeline.html', messages=messages)
 
 @app.route('/<username>')
 def user_timeline(username):
     """Display's a users tweets."""
-    profile_user = query_db('select * from user where username = ?',
-                            [username], one=True)
+	cid = session['user_id']
+    profile_user = User.query(username == username).get()
+    pid = profile_user.key.id()
     if profile_user is None:
         abort(404)
     followed = False
-    if g.user:
-        followed = query_db('''select 1 from follower where
-            follower.who_id = ? and follower.whom_id = ?''',
-            [session['user_id'], profile_user['user_id']],
-            one=True) is not None
-    return render_template('timeline.html', messages=query_db('''
-            select message.*, user.* from message, user where
-            user.user_id = message.author_id and user.user_id = ?
-            order by message.pub_date desc limit ?''',
-            [profile_user['user_id'], PER_PAGE]), followed=followed,
-            profile_user=profile_user)
-
-
+    if g.user and pid in User.get_by_id(cid).following:
+        	followed = True
+    return render_template('timeline.html', messages = Message.query(author == pid).order(-Message.pub_date).fetch(30), \
+    		followed = followed, \
+            profile_user = profile_user)
+			
+			
 @app.route('/<username>/follow')
 def follow_user(username):
     """Adds the current user as follower of the given user."""
+    cid = session['user_id']
     if not g.user:
         abort(401)
-    whom_id = get_user_id(username)
+    whom = User.query(User.username == username).get()
+    whom_id = whom.key.id()
     if whom_id is None:
         abort(404)
-    db = get_db()
-    db.execute('insert into follower (who_id, whom_id) values (?, ?)',
-              [session['user_id'], whom_id])
-    db.commit()
+    a = User.get_by_id(cid).following.append(whom_id)
+    a.put()
     flash('You are now following "%s"' % username)
     return redirect(url_for('user_timeline', username=username))
 
@@ -129,15 +99,16 @@ def follow_user(username):
 @app.route('/<username>/unfollow')
 def unfollow_user(username):
     """Removes the current user as follower of the given user."""
+    cid = session['user_id']
     if not g.user:
         abort(401)
-    whom_id = get_user_id(username)
+    whom = User.query(User.username == username).get()
+    whom_id = whom.key.id()
     if whom_id is None:
         abort(404)
-    db = get_db()
-    db.execute('delete from follower where who_id=? and whom_id=?',
-              [session['user_id'], whom_id])
-    db.commit()
+
+    a = User.get_by_id(cid).following.remove(whom_id)
+    a.put()
     flash('You are no longer following "%s"' % username)
     return redirect(url_for('user_timeline', username=username))
 
@@ -174,7 +145,7 @@ def login():
     return render_template('login.html', error=error)
 
 def get_user_id(u):
-	a = User.query(username==u).fetch()
+	a = User.query(User.username == u).fetch()
 	if len(a) > 0:
 		return True
 	return False
@@ -220,5 +191,4 @@ app.jinja_env.filters['gravatar'] = gravatar_url
 
 
 if __name__ == '__main__':
-    init_db()
     app.run()

@@ -25,7 +25,10 @@ class Message(ndb.Model):
     
 def get_user_id(u):
     a = User.query(User.username == u).get()
-    return a.key.id()
+    if a:
+        return a.key.id() 
+    else:
+        return None
 
 
 def format_datetime(timestamp):
@@ -56,8 +59,10 @@ def timeline():
 	cid = session['user_id']
 	ids = User.get_by_id(cid).following.append(cid)
 	messages = Message.query(Message.author.IN(ids)).order(-Message.pub_date).fetch(30)
-	return render_template('timeline.html', messages = messages)
-        
+    if not messages:
+        messages = []
+    return render_template('timeline.html', messages = messages)
+
 @app.route('/public')
 def public_timeline():
     """Displays the latest messages of all users."""
@@ -133,7 +138,7 @@ def login():
         return redirect(url_for('timeline'))
     error = None
     if request.method == 'POST':
-        user = User.query(User.username == request.form['username']).fetch(1)
+        user = User.query(User.username == request.form['username']).get()
         if user is None:
             error = 'Invalid username'
         elif not check_password_hash(user.pw_hash,

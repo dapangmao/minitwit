@@ -15,14 +15,15 @@ class User(ndb.Model):
     username = ndb.StringProperty(required=True)
     email = ndb.StringProperty(required=True)
     pw_hash = ndb.StringProperty(required=True)
-    following = ndb.KeyProperty(repeated=True)
+    following = ndb.IntegerProperty(repeated=True)
     start_date = ndb.DateTimeProperty(auto_now_add=True)
     
 class Message(ndb.Model):
-    author = ndb.IntegerProperty()
+    author = ndb.IntegerProperty(required=True)
     text = ndb.TextProperty(required=True)
     pub_date = ndb.DateTimeProperty(auto_now_add=True)
-    
+    email = ndb.StringProperty(required=True)    
+
 def get_user_id(u):
     a = User.query(User.username == u).get()
     if a:
@@ -121,11 +122,13 @@ def unfollow_user(username):
 
 @app.route('/add_message', methods=['POST'])
 def add_message():
+    cid = session['user_id']
     """Registers a new message for the user."""
     if 'user_id' not in session:
         abort(401)
     if request.form['text']:
-    	new_message = Message(author = session['user_id'], text = request.form['text'])
+        email = User.get_by_id(cid).email
+    	new_message = Message(author = cid, text = request.form['text'], email = email)
         new_message.put()
         flash('Your message was recorded')
     return redirect(url_for('timeline'))
@@ -167,7 +170,7 @@ def register():
             error = 'You have to enter a password'
         elif request.form['password'] != request.form['password2']:
             error = 'The two passwords do not match'
-        elif get_user_id(request.form['username']) is not None:
+        elif not get_user_id(request.form['username']):
             error = 'The username is already taken'
         else:
             a = User(username = request.form['username'], email = request.form['email'], \

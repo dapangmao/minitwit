@@ -19,7 +19,7 @@ class User(ndb.Model):
     start_date = ndb.DateTimeProperty(auto_now_add=True)
     
 class Message(ndb.Model):
-    author = ndb.KeyProperty()
+    author = ndb.StringProperty()
     text = ndb.TextProperty(required=True)
     pub_date = ndb.DateTimeProperty(auto_now_add=True)
     

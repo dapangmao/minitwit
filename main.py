@@ -33,8 +33,8 @@ def get_user_id(u):
 
 def format_datetime(d):
     """Format a timestamp for display."""
-	stamp = calendar.timegm(d.timetuple())
-	return datetime.datetime.utcfromtimestamp(stamp).strftime('%Y-%m-%d @ %H:%M')   
+    stamp = calendar.timegm(d.timetuple())
+    return datetime.datetime.utcfromtimestamp(stamp).strftime('%Y-%m-%d @ %H:%M')   
 
 def gravatar_url(email, size=80):
     """Return the gravatar image for the given email address."""

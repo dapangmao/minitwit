@@ -90,13 +90,18 @@ def user_timeline(username):
 def follow_user(username):
     """Adds the current user as follower of the given user."""
     if not g.user:
-        abort(401)
+        abort(401) # user has not logged in yet
     cid = session['user_id']
     whom_id = get_user_id(username)
     if whom_id is None:
         abort(404)
-    update_user = User.get_by_id(cid).following.append(whom_id)
-    update_user.put()
+    u = User.get_by_id(cid)
+    if u.following is None:
+    	u.following = [whom_id]
+    	u.put()
+    else:
+    	u.following.append(whom_id)
+    	u.put()
     flash('You are now following "%s"' % username)
     return redirect(url_for('user_timeline', username = username))
 

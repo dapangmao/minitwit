@@ -27,8 +27,8 @@ class Message(ndb.Model):
 def get_user_id(u):
     a = User.query(User.username == u).get()
     if a:
-        return a.key.id() 
-	return None
+        return a.key.id()
+    return None
 
 def format_datetime(timestamp):
     """Format a timestamp for display."""

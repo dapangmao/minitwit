@@ -106,10 +106,8 @@ def unfollow_user(username):
         abort(401)
 
     whom_id = get_user_id(username)
-    
     if whom_id is None:
         abort(404)
-
     a = User.get_by_id(cid).following.remove(whom_id)
     a.put()
     flash('You are no longer following "%s"' % username)
@@ -166,9 +164,9 @@ def register():
         elif get_user_id(request.form['username']) is not None:
             error = 'The username is already taken'
         else:
-            a = User(username = request.form['username'], email = request.form['email'], \
+            new_user = User(username = request.form['username'], email = request.form['email'], \
             	pw_hash = generate_password_hash(request.form['password']))
-            a.put()
+            new_user.put()
             flash('You were successfully registered and can login now')
             return redirect(url_for('login'))
     return render_template('register.html', error=error)

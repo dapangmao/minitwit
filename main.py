@@ -28,13 +28,11 @@ def get_user_id(u):
     a = User.query(User.username == u).get()
     if a:
         return a.key.id() 
-    else:
-        return None
-
+	return None
 
 def format_datetime(timestamp):
     """Format a timestamp for display."""
-    return datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d @ %H:%M')
+    return timestamp.split('.')[0]
 
 
 def gravatar_url(email, size=80):
@@ -85,7 +83,6 @@ def user_timeline(username):
     		followed = followed, \
             profile_user = profile_user)
 			
-			
 @app.route('/<username>/follow')
 def follow_user(username):
     """Adds the current user as follower of the given user."""
@@ -100,7 +97,6 @@ def follow_user(username):
     a.put()
     flash('You are now following "%s"' % username)
     return redirect(url_for('user_timeline', username=username))
-
 
 @app.route('/<username>/unfollow')
 def unfollow_user(username):
@@ -119,7 +115,6 @@ def unfollow_user(username):
     flash('You are no longer following "%s"' % username)
     return redirect(url_for('user_timeline', username=username))
 
-
 @app.route('/add_message', methods=['POST'])
 def add_message():
     cid = session['user_id']
@@ -132,7 +127,6 @@ def add_message():
         new_message.put()
         flash('Your message was recorded')
     return redirect(url_for('timeline'))
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -152,7 +146,6 @@ def login():
             session['user_id'] = get_user_id(request.form['username'])
             return redirect(url_for('timeline'))
     return render_template('login.html', error=error)
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -180,7 +173,6 @@ def register():
             return redirect(url_for('login'))
     return render_template('register.html', error=error)
 
-
 @app.route('/logout')
 def logout():
     """Logs the user out."""
@@ -190,7 +182,7 @@ def logout():
 
 
 # add some filters to jinja
-# app.jinja_env.filters['datetimeformat'] = format_datetime
+app.jinja_env.filters['datetimeformat'] = format_datetime
 app.jinja_env.filters['gravatar'] = gravatar_url
 
 

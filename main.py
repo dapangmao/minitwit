@@ -123,10 +123,11 @@ def unfollow_user(username):
 
 @app.route('/add_message', methods=['POST'])
 def add_message():
-    cid = session['user_id']
+    
     """Registers a new message for the user."""
     if 'user_id' not in session:
         abort(401)
+    cid = session['user_id']
     if request.form['text']:
         email = User.get_by_id(cid).email
         username = User.get_by_id(cid).username

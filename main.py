@@ -163,7 +163,7 @@ def register():
             error = 'You have to enter a password'
         elif request.form['password'] != request.form['password2']:
             error = 'The two passwords do not match'
-        elif not get_user_id(request.form['username']):
+        elif get_user_id(request.form['username']) is not None:
             error = 'The username is already taken'
         else:
             a = User(username = request.form['username'], email = request.form['email'], \

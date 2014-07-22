@@ -180,7 +180,6 @@ def logout():
     session.pop('user_id', None)
     return redirect(url_for('public_timeline'))
 
-
 # add some filters to jinja
 app.jinja_env.filters['datetimeformat'] = format_datetime
 app.jinja_env.filters['gravatar'] = gravatar_url

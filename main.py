@@ -108,15 +108,16 @@ def follow_user(username):
 @app.route('/<username>/unfollow')
 def unfollow_user(username):
     """Removes the current user as follower of the given user."""
-    cid = session['user_id']
+    
     if not g.user:
         abort(401)
-
+    cid = session['user_id']
     whom_id = get_user_id(username)
     if whom_id is None:
         abort(404)
-    a = User.get_by_id(cid).following.remove(whom_id)
-    a.put()
+    u = User.get_by_id(cid)
+    u.following.remove(whom_id)
+    u.put()
     flash('You are no longer following "%s"' % username)
     return redirect(url_for('user_timeline', username=username))
 

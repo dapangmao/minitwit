@@ -89,17 +89,16 @@ def user_timeline(username):
 @app.route('/<username>/follow')
 def follow_user(username):
     """Adds the current user as follower of the given user."""
-    cid = session['user_id']
     if not g.user:
         abort(401)
-    
+    cid = session['user_id']
     whom_id = get_user_id(username)
     if whom_id is None:
         abort(404)
-    a = User.get_by_id(cid).following.append(whom_id)
-    a.put()
+    update_user = User.get_by_id(cid).following.append(whom_id)
+    update_user.put()
     flash('You are now following "%s"' % username)
-    return redirect(url_for('user_timeline', username=username))
+    return redirect(url_for('user_timeline', username = username))
 
 @app.route('/<username>/unfollow')
 def unfollow_user(username):

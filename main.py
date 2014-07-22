@@ -81,7 +81,7 @@ def user_timeline(username):
     if g.user:
     	cid = session['user_id']
     	if pid in User.get_by_id(cid).following:
-        	followed = True
+            followed = True
     return render_template('timeline.html', messages = Message.query(Message.author == pid).order(-Message.pub_date).fetch(30), \
     		followed = followed, \
             profile_user = profile_user)

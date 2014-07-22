@@ -22,7 +22,8 @@ class Message(ndb.Model):
     author = ndb.IntegerProperty(required=True)
     text = ndb.TextProperty(required=True)
     pub_date = ndb.DateTimeProperty(auto_now_add=True)
-    email = ndb.StringProperty(required=True)    
+    email = ndb.StringProperty(required=True)  
+    username = ndb.StringProperty(required=True)
 
 def get_user_id(u):
     a = User.query(User.username == u).get()
@@ -121,7 +122,8 @@ def add_message():
         abort(401)
     if request.form['text']:
         email = User.get_by_id(cid).email
-    	new_message = Message(author = cid, text = request.form['text'], email = email)
+        username = User.get_by_id(cid).username
+    	new_message = Message(author = cid, text = request.form['text'], email = email, username = username)
         new_message.put()
         flash('Your message was recorded')
     return redirect(url_for('timeline'))

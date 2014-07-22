@@ -1,6 +1,6 @@
 
 from hashlib import md5
-from datetime import datetime
+from datetime, calendar
 from flask import Flask, request, session, url_for, redirect, render_template, abort, g, flash
 from werkzeug import check_password_hash, generate_password_hash
 from google.appengine.ext import ndb
@@ -31,10 +31,10 @@ def get_user_id(u):
         return a.key.id()
     return None
 
-def format_datetime(timestamp):
+def format_datetime(d):
     """Format a timestamp for display."""
-    return timestamp.split('.')[0]
-
+	stamp = calendar.timegm(d.timetuple())
+	return datetime.datetime.utcfromtimestamp(stamp).strftime('%Y-%m-%d @ %H:%M')   
 
 def gravatar_url(email, size=80):
     """Return the gravatar image for the given email address."""

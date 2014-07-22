@@ -41,7 +41,6 @@ def gravatar_url(email, size=80):
     return 'http://www.gravatar.com/avatar/%s?d=identicon&s=%d' % \
         (md5(email.strip().lower().encode('utf-8')).hexdigest(), size)
 
-
 @app.before_request
 def before_request():
     g.user = None
@@ -83,8 +82,7 @@ def user_timeline(username):
     	if pid in User.get_by_id(cid).following:
             followed = True
     return render_template('timeline.html', messages = Message.query(Message.author == pid).order(-Message.pub_date).fetch(30), \
-    		followed = followed, \
-            profile_user = profile_user)
+    		followed = followed, profile_user = profile_user)
 			
 @app.route('/<username>/follow')
 def follow_user(username):
@@ -119,7 +117,7 @@ def unfollow_user(username):
     u.following.remove(whom_id)
     u.put()
     flash('You are no longer following "%s"' % username)
-    return redirect(url_for('user_timeline', username=username))
+    return redirect(url_for('user_timeline', username = username))
 
 @app.route('/add_message', methods=['POST'])
 def add_message():
@@ -146,8 +144,7 @@ def login():
         user = User.query(User.username == request.form['username']).get()
         if user is None:
             error = 'Invalid username'
-        elif not check_password_hash(user.pw_hash,
-                                     request.form['password']):
+        elif not check_password_hash(user.pw_hash, request.form['password']):
             error = 'Invalid password'
         else:
             flash('You were logged in')

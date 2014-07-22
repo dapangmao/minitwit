@@ -127,9 +127,8 @@ def add_message():
         abort(401)
     cid = session['user_id']
     if request.form['text']:
-        email = User.get_by_id(cid).email
-        username = User.get_by_id(cid).username
-    	new_message = Message(author = cid, text = request.form['text'], email = email, username = username)
+        u = User.get_by_id(cid)
+    	new_message = Message(author = cid, text = request.form['text'], email = u.email, username = u.username)
         new_message.put()
         flash('Your message was recorded')
     return redirect(url_for('timeline'))
@@ -150,7 +149,7 @@ def login():
             flash('You were logged in')
             session['user_id'] = get_user_id(request.form['username'])
             return redirect(url_for('timeline'))
-    return render_template('login.html', error=error)
+    return render_template('login.html', error = error)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -176,7 +175,7 @@ def register():
             new_user.put()
             flash('You were successfully registered and can login now')
             return redirect(url_for('login'))
-    return render_template('register.html', error=error)
+    return render_template('register.html', error = error)
 
 @app.route('/logout')
 def logout():

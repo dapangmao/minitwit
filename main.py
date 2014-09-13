@@ -71,19 +71,18 @@ def public_timeline():
 @app.route('/<username>')
 def user_timeline(username):
     """Display's a users tweets."""
-    
     profile_user = User.query(User.username == username).get()
     if profile_user is None:
         abort(404)
     pid = profile_user.key.id()
     followed = False
     if g.user:
-    	cid = session['user_id']
-    	if pid in User.get_by_id(cid).following:
+        cid = session['user_id']
+        if pid in User.get_by_id(cid).following:
             followed = True
     return render_template('timeline.html', messages = Message.query(Message.author == pid).order(-Message.pub_date).fetch(30), \
-    		followed = followed, profile_user = profile_user)
-			
+            followed = followed, profile_user = profile_user)
+            
 @app.route('/<username>/follow')
 def follow_user(username):
     """Adds the current user as follower of the given user."""
@@ -95,11 +94,11 @@ def follow_user(username):
         abort(404)
     u = User.get_by_id(cid)
     if u.following is None:
-    	u.following = [whom_id]
-    	u.put()
+        u.following = [whom_id]
+        u.put()
     else:
-    	u.following.append(whom_id)
-    	u.put()
+        u.following.append(whom_id)
+        u.put()
     flash('You are now following "%s"' % username)
     return redirect(url_for('user_timeline', username = username))
 
@@ -127,7 +126,7 @@ def add_message():
     cid = session['user_id']
     if request.form['text']:
         u = User.get_by_id(cid)
-    	new_message = Message(author = cid, text = request.form['text'], email = u.email, username = u.username)
+        new_message = Message(author = cid, text = request.form['text'], email = u.email, username = u.username)
         new_message.put()
         flash('Your message was recorded')
     return redirect(url_for('timeline'))
@@ -160,7 +159,7 @@ def register():
         if not request.form['username']:
             error = 'You have to enter a username'
         elif not request.form['email'] or \
-		'@' not in request.form['email']:
+        '@' not in request.form['email']:
             error = 'You have to enter a valid email address'
         elif not request.form['password']:
             error = 'You have to enter a password'
@@ -170,7 +169,7 @@ def register():
             error = 'The username is already taken'
         else:
             new_user = User(username = request.form['username'], email = request.form['email'], \
-            	pw_hash = generate_password_hash(request.form['password']))
+                pw_hash = generate_password_hash(request.form['password']))
             new_user.put()
             flash('You were successfully registered and can login now')
             return redirect(url_for('login'))

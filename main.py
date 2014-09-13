@@ -106,7 +106,6 @@ def follow_user(username):
 @app.route('/<username>/unfollow')
 def unfollow_user(username):
     """Removes the current user as follower of the given user."""
-    
     if not g.user:
         abort(401)
     cid = session['user_id']
@@ -187,7 +186,6 @@ def logout():
 # add some filters to jinja
 app.jinja_env.filters['datetimeformat'] = format_datetime
 app.jinja_env.filters['gravatar'] = gravatar_url
-
 
 if __name__ == '__main__':
     app.run()

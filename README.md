@@ -6,7 +6,7 @@ Flask is a light-weight web framework for Python, which is well documented and c
 
 [Google App Engine](https://appengine.google.com/) is a major public clouder service besides Amazon EC2. 
 
--Pro: 
+- Pro: 
   - It allows 25 free apps
   - The database is free
 

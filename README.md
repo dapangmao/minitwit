@@ -28,7 +28,7 @@ A Flask skeleton can be dowloaded from [Google Developer Console](https://consol
 ####Step2: schema design 
 The dabase used for the original minitwit is SQLite. [The schema](https://github.com/mitsuhiko/flask/blob/master/examples/minitwit/schema.sql) consists of three tables: `user`, `follower` and `message`, which makes a normalized database together. GAE has two Datastore APIs: [DB](https://cloud.google.com/appengine/docs/python/datastore/) and [NDB](https://cloud.google.com/appengine/docs/python/ndb/). Since neither of them supports joining (one-to-many joining for user to follower in this app), I move the `follwer` table as an nested text propery into the `user` table, which eliminatse the need for joining. 
 
-Now the schema looks like --
+As the result, the `main.py` has two data models: `User` and `Message`. They will create and maintain two `kind`s (or tables) in Datastore. 
 ```python
 class User(ndb.Model):
   username = ndb.StringProperty(required=True)

@@ -46,7 +46,9 @@ class Message(ndb.Model):
 ```
 
 ####Step3: replace SQL statements
-The next step is to replace SQL operations in each of the routing functions with NDB's methods. NDB's two fundamental methods are `get()` that retrieves data from Datastore as a list, and `put()` that pushes list to Datastore as a row. Data is created and manipulated as individual object. For example, if a follower needs to add to a user, I first retrieve the user by its ID that returns a list like `[username, email, pw_hash, following, start_date]`, where following itself is a list. Then I insert the new follower into the following element and save it back again. 
+The next step is to replace SQL operations in each of the routing functions with NDB's methods. NDB's two fundamental methods are `get()` that retrieves data from Datastore as a list, and `put()` that pushes list to Datastore as a row. In short, data is created and manipulated as individual object. 
+
+For example, if a follower needs to add to a user, I first retrieve the user by its ID that returns a list like `[username, email, pw_hash, following, start_date]`, where following itself is a list. Then I insert the new follower into the following element and save it back again. 
 
 ####Setp4: testing and deployment
 

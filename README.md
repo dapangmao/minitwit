@@ -5,13 +5,7 @@ Steps to deploy Flask's minitwit on Google App Enginee
 
 [Google App Engine](https://appengine.google.com/) or GAE is a major public clouder service besides Amazon EC2. 
 
-- Pro: 
-  - It allows up to 25 free apps (great for exercise)
-  - Use of database is free
-  - Automatical memoryCached for high IO
-- Con:
-  - Database is No-SQL, which is hard to port
-  - More expensive for production than EC2
+
   
 Most importantly, GAE is friendly to Python users, possibly because Guido van Rossum worked there and personally created Python datastore interface. As for me, it is a good choice for a Flask app. 
   
@@ -49,9 +43,6 @@ The next step is to replace SQL operations in each of the routing functions with
 
 For example, if a follower needs to add to a user, I first retrieve the user by its ID that returns a list like `[username, email, pw_hash, following, start_date]`, where following itself is a list. Then I insert the new follower into the following element and save it back again. 
 ```python
-whom_id = get_user_id(username)
-if whom_id is None:
-  abort(404)
 u = User.get_by_id(cid)
 if u.following is None:
   u.following = [whom_id]
@@ -60,12 +51,21 @@ else:
   u.following.append(whom_id)
   u.put()
 ```
+People with experience in ORM such as [SQLAlchemy]()
 
 ####Setp4: testing and deployment
 
+Without the schema file, now the minitwit is a real single file web app. 
 
 
 
-
+In conclusion, GAE has a few advantages and disadvantages to work with Flask as a web app.
+- Pro: 
+  - It allows up to 25 free apps (great for exercise)
+  - Use of database is free
+  - Automatical memoryCached for high IO
+- Con:
+  - Database is No-SQL, which is hard to port
+  - More expensive for production than EC2
 
 

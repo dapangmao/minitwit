@@ -3,11 +3,7 @@ Steps to deploy Flask's minitwit on Google App Enginee
 
 [Flask](https://github.com/mitsuhiko/flask) is a light-weight web framework for Python, which is well documented and clearly written. Its Github depository provides a few examples, which includes [minitwit](https://github.com/mitsuhiko/flask/tree/master/examples/minitwit). The `minittwit` website enjoys a few basic features of social network such as following, login/logout. The demo site on GAE is [http://minitwit-123.appspot.com](http://minitwit-123.appspot.com). The Github depo is [https://github.com/dapangmao/minitwit](https://github.com/dapangmao/minitwit).
 
-[Google App Engine](https://appengine.google.com/) or GAE is a major public clouder service besides Amazon EC2. 
-
-
-  
-Most importantly, GAE is friendly to Python users, possibly because Guido van Rossum worked there and personally created Python datastore interface. As for me, it is a good choice for a Flask app. 
+[Google App Engine](https://appengine.google.com/) or GAE is a major public clouder service besides Amazon EC2. Among the four languages(Java/Python/Go/PHP) it supports, GAE is friendly to Python users, possibly because Guido van Rossum worked there and personally created Python datastore interface. As for me, it is a good choice for a Flask app. 
   
 ####Step1: download GAE SDK and GAE Flask skeleton 
 
@@ -51,13 +47,10 @@ else:
   u.following.append(whom_id)
   u.put()
 ```
-People with experience in ORM such as [SQLAlchemy]()
+People with experience in ORM such as [SQLAlchemy](http://www.sqlalchemy.org/) will be comfortable to implement the changes. 
 
 ####Setp4: testing and deployment
-
-Without the schema file, now the minitwit is a real single file web app. 
-
-
+Without the schema file, now the minitwit is a real single file web app. It's time to use GAE SDK to test it locally, or eventually push it to the cloud. On [GAE](https://appengine.google.com/), We can check any error or warning through the `Logs` tab to find bugs, or view the raw data through the `Datastore Viewer` tab. 
 
 In conclusion, GAE has a few advantages and disadvantages to work with Flask as a web app.
 - Pro: 

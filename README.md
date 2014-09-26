@@ -54,11 +54,11 @@ Without the schema file, now the minitwit is a real single file web app. It's ti
 
 In conclusion, GAE has a few advantages and disadvantages to work with Flask as a web app.
 - Pro: 
-  - It allows up to 25 free apps (great for exercise)
+  - It allows up to 25 free apps (great for exercises)
   - Use of database is free
   - Automatical memoryCached for high IO
 - Con:
-  - Database is No-SQL, which is hard to port
+  - Database is No-SQL, which makes data hard to port
   - More expensive for production than EC2
 
 

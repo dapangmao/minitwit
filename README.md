@@ -26,9 +26,9 @@ A Flask skeleton can be dowloaded from [Google Developer Console](https://consol
   - main.py: the root Python program
 
 ####Step2: schema design 
-The dabase used for the original minitwit is SQLite. [The schema](https://github.com/mitsuhiko/flask/blob/master/examples/minitwit/schema.sql) consists of three tables: `user`, `follower` and `message`, which makes a normalized database together. GAE has two Datastore APIs: [DB](https://cloud.google.com/appengine/docs/python/datastore/) and [NDB](https://cloud.google.com/appengine/docs/python/ndb/). Since neither of them supports joining (one-to-many joining for user to follower in this app), I move the `follwer` table as an nested text propery into the `user` table, which eliminatse the need for joining. 
+The dabase used for the original minitwit is SQLite. [The schema](https://github.com/mitsuhiko/flask/blob/master/examples/minitwit/schema.sql) consists of three tables: `user`, `follower` and `message`, which makes a normalized database together. GAE has two Datastore APIs: [DB](https://cloud.google.com/appengine/docs/python/datastore/) and [NDB](https://cloud.google.com/appengine/docs/python/ndb/). Since neither of them supports joining (in this case one-to-many joining for user to follower), I move the `follwer` table as an nested text propery into the `user` table, which eliminatse the need for joining. 
 
-As the result, the `main.py` has two data models: `User` and `Message`. They will create and maintain two `kind`s (or tables) in Datastore. 
+As the result, the `main.py` has two data models: `User` and `Message`. They will create and maintain two `kind`s (or we call them as tables) with the same names in Datastore. 
 ```python
 class User(ndb.Model):
   username = ndb.StringProperty(required=True)
@@ -45,14 +45,14 @@ class Message(ndb.Model):
   username = ndb.StringProperty(required=True)
 ```
 
+####Step3: replace SQL statements
+The next step is to replace SQL operations in each of the routing functions with NDB's methods. NDB's two fundamental methods are `get()` that retrieves data from Datastore as a list, and `put()` that pushes list to Datastore as a row. Data is created and manipulated as individual object. For example, if a follower needs to add to a user, I first retrieve the user by its ID that returns a list like `[username, email, pw_hash, following, start_date]`, where following itself is a list. Then I insert the new follower into the following element and save it back again. 
+
+####Setp4: testing and deployment
 
 
 
 
 
-This repo is the example [minitwit](https://github.com/mitsuhiko/flask/tree/master/examples/minitwit) from Flask running on Google App Engine. The site URL is http://minitwit-123.appspot.com
-
-1. Used Google Datastore instead of SQLite
-2. Modified schemes and added indexes
 
 

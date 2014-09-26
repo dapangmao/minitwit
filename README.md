@@ -2,7 +2,7 @@ Steps to deploy Flask's minitwit on Google App Enginee
 ---
 
 
-[Flask](https://github.com/mitsuhiko/flask) is a light-weight web framework for Python, which is well documented and clearly written. Its Github depository provides a few examples, which includes [minitwit](https://github.com/mitsuhiko/flask/tree/master/examples/minitwit). The `minittwit` website enjoys a few basic features of social network such as following, login/logout. 
+[Flask](https://github.com/mitsuhiko/flask) is a light-weight web framework for Python, which is well documented and clearly written. Its Github depository provides a few examples, which includes [minitwit](https://github.com/mitsuhiko/flask/tree/master/examples/minitwit). The `minittwit` website enjoys a few basic features of social network such as following, login/logout. The demo site on GAE is [http://minitwit-123.appspot.com/public](http://minitwit-123.appspot.com/public).
 
 [Google App Engine](https://appengine.google.com/) or GAE is a major public clouder service besides Amazon EC2. 
 
@@ -18,9 +18,12 @@ Most importantly, GAE is friendly to Python users, possibly because Guido van Ro
   
 ####Step1: download GAE SDK and GAE Flask skeleton 
 
-GAE SDK tests the staging app and eventuall pushes the app to the cloud. 
-Flask skeleton can be dowloaded from [Google Developer Console](https://console.developers.google.com/start/appengine). 
+[GAE's Python SDK](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python) tests the staging app and eventuall pushes the app to the cloud. 
 
+Flask skeleton can be dowloaded from [Google Developer Console](https://console.developers.google.com/start/appengine). It contains three files:
+  - app.yaml: specify the entrance of run-time
+  - appengine_config.py: add the external libraries such as Flask to system path 
+  - main.py: the root Python program
 
 ####Step2: schema design 
 The 

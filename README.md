@@ -1,7 +1,6 @@
 Steps to deploy Flask's minitwit on Google App Enginee 
 ---
 
-
 [Flask](https://github.com/mitsuhiko/flask) is a light-weight web framework for Python, which is well documented and clearly written. Its Github depository provides a few examples, which includes [minitwit](https://github.com/mitsuhiko/flask/tree/master/examples/minitwit). The `minittwit` website enjoys a few basic features of social network such as following, login/logout. The demo site on GAE is [http://minitwit-123.appspot.com](http://minitwit-123.appspot.com). The Github depo is [https://github.com/dapangmao/minitwit](https://github.com/dapangmao/minitwit).
 
 [Google App Engine](https://appengine.google.com/) or GAE is a major public clouder service besides Amazon EC2. 
@@ -49,6 +48,18 @@ class Message(ndb.Model):
 The next step is to replace SQL operations in each of the routing functions with NDB's methods. NDB's two fundamental methods are `get()` that retrieves data from Datastore as a list, and `put()` that pushes list to Datastore as a row. In short, data is created and manipulated as individual object. 
 
 For example, if a follower needs to add to a user, I first retrieve the user by its ID that returns a list like `[username, email, pw_hash, following, start_date]`, where following itself is a list. Then I insert the new follower into the following element and save it back again. 
+```python
+whom_id = get_user_id(username)
+if whom_id is None:
+  abort(404)
+u = User.get_by_id(cid)
+if u.following is None:
+  u.following = [whom_id]
+  u.put()
+else:
+  u.following.append(whom_id)
+  u.put()
+```
 
 ####Setp4: testing and deployment
 

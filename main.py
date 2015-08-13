@@ -119,7 +119,6 @@ def unfollow_user(username):
 
 @app.route('/add_message', methods=['POST'])
 def add_message():
-    
     """Registers a new message for the user."""
     if 'user_id' not in session:
         abort(401)
